@@ -16,6 +16,27 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the account was created (auto-filled with current timestamp)
 );
 
+-- Create the Profiles table to store user profile information
+CREATE TABLE profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,          -- Unique profile ID (Primary Key, auto-incrementing)
+    user_id INT NOT NULL,                        -- Foreign key referencing the 'users' table
+    bio TEXT,                                    -- Short biography or description of the user
+    profile_picture VARCHAR(255),                -- URL or path to the user's profile picture
+    social_links JSON,                           -- JSON object containing social media links (e.g., Facebook, Twitter)
+    FOREIGN KEY (user_id) REFERENCES users(id)   -- Foreign key constraint: links the profile to the user
+);
+
+CREATE TABLE `profiles` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `avatar` VARCHAR(255) DEFAULT NULL,
+    `bio` TEXT DEFAULT NULL,
+    `preferences` JSON DEFAULT NULL, -- for theme, notifications etc.
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+);
+
+
 -- Create the 'categories' table
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,          -- Unique category ID (Primary Key, auto-incrementing)
