@@ -88,28 +88,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // If images are uploaded successfully, insert product and images into the database
             if (empty($error_message)) {
-                // Convert the image names array into a comma-separated string
-                $image_list = implode(',', $image_names);
+                // Insert product WITHOUT the 'image' field since images are stored in product_images table
+                $query = "INSERT INTO products (category, name, description, price, discount, height, width, material, weight, size) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                // Prepare the SQL statement to insert product details
-                $query = "INSERT INTO products (category, name, description, price, discount, image, height, width, material, weight, size) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-                // Initialize prepared statement
                 $stmt = mysqli_prepare($conn, $query);
+                mysqli_stmt_bind_param($stmt, 'issdddddss', $category, $name, $description, $price, $discount, $height, $width, $materials, $weight, $size);
 
-                // Bind the parameters
-                mysqli_stmt_bind_param($stmt, 'sssssssssss', $category, $name, $description, $price, $discount, $image_list, $height, $width, $materials, $weight, $size);
-
-                // Execute the statement
                 if (mysqli_stmt_execute($stmt)) {
-                    $success_message = 'Product added successfully with multiple images!';
+                    // Get inserted product id
+                    $product_id = mysqli_insert_id($conn);
+
+                    // Insert each image into product_images table with product_id
+                    foreach ($image_names as $index => $img_name) {
+                        $is_main = ($index === 0) ? 1 : 0; // First image is main image
+
+                        $img_query = "INSERT INTO product_images (product_id, image_url, is_main) VALUES (?, ?, ?)";
+                        $img_stmt = mysqli_prepare($conn, $img_query);
+                        mysqli_stmt_bind_param($img_stmt, 'isi', $product_id, $img_name, $is_main);
+                        mysqli_stmt_execute($img_stmt);
+                        mysqli_stmt_close($img_stmt);
+                    }
+
+                    $success_message = 'Product and images added successfully!';
                 } else {
-                    $error_message = 'Error: ' . mysqli_error($conn);
+                    $error_message = 'Error inserting product: ' . mysqli_error($conn);
                 }
-                // Close the statement
+
                 mysqli_stmt_close($stmt);
             }
+
         }
     }
 }
