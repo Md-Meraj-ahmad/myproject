@@ -1,42 +1,60 @@
-<?php session_start(); ?>
+<?php
+session_start();
 
+// Function to mark active links
+function activeLink($path) {
+    return strpos($_SERVER['REQUEST_URI'], $path) === 0 ? 'text-yellow-300' : 'hover:text-yellow-300';
+}
+
+$cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
+?>
+
+<!-- Header -->
 <header class="bg-indigo-600 fixed w-full top-0 left-1/2 transform -translate-x-1/2 shadow-md z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-4 py-3">
-        <!-- Left: Hamburger Icon (Mobile) -->
+        <!-- Mobile: Hamburger -->
         <div class="md:hidden">
             <button onclick="toggleMenu()" class="text-white text-xl hover:scale-110 transition">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
 
-        <!-- Center: Brand Name -->
+        <!-- Logo / Brand -->
         <a href="/" class="text-3xl font-bold text-white tracking-wide flex items-center space-x-1">
             <span class="text-yellow-300">Nepal</span><span class="text-white">Bazar</span>
         </a>
 
-        <!-- Right: Desktop Navigation -->
+        <!-- Desktop Nav -->
         <div class="hidden md:flex items-center space-x-8 text-white">
             <nav class="flex space-x-4">
-                <a href="/" class="hover:text-yellow-300 transition duration-300">Home</a>
-                <a href="/products" class="hover:text-yellow-300 transition duration-300">Products</a>
-                <a href="/blogs" class="hover:text-yellow-300 transition duration-300">Blogs</a>
-                <a href="/contact" class="hover:text-yellow-300 transition duration-300">Contact</a>
-                <a href="/policy" class="hover:text-yellow-300 transition duration-300">Policy</a>
+                <a href="/" class="<?php echo activeLink('/'); ?> transition duration-300">Home</a>
+                <a href="/products" class="<?php echo activeLink('/products'); ?> transition duration-300">Products</a>
+                <a href="/blogs" class="<?php echo activeLink('/blogs'); ?> transition duration-300">Blogs</a>
+                <a href="/contact" class="<?php echo activeLink('/contact'); ?> transition duration-300">Contact</a>
+                <a href="/policy" class="<?php echo activeLink('/policy'); ?> transition duration-300">Policy</a>
             </nav>
 
-            <!-- Cart Button -->
+            <!-- Cart -->
             <a href="/cart" class="relative flex items-center bg-white text-indigo-700 px-3 py-2 rounded-lg hover:bg-indigo-100 transition">
                 <i class="fas fa-shopping-cart mr-1"></i>
                 <span>Cart</span>
-                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    <?php echo $cart_count; ?>
+                </span>
             </a>
 
-            <!-- User Icon / Auth -->
+            <!-- User Icon / Dropdown -->
             <div>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <div class="flex items-center space-x-2">
-                        <img src="/assets/images/user-avatar.png" alt="User" class="w-8 h-8 rounded-full border border-white">
-                        <a href="/account/logout.php" class="text-sm font-semibold hover:underline">Logout</a>
+                    <div class="relative">
+                        <button onclick="toggleDropdown()" class="flex items-center space-x-2 focus:outline-none">
+                            <img src="/assets/images/user-avatar.png" alt="User" class="w-8 h-8 rounded-full border border-white">
+                        </button>
+                        <div id="userDropdown" class="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-md hidden z-50">
+                            <a href="/account/profile.php" class="block px-4 py-2 hover:bg-indigo-100">Profile</a>
+                            <a href="/account/orders.php" class="block px-4 py-2 hover:bg-indigo-100">Orders</a>
+                            <a href="/account/logout.php" class="block px-4 py-2 text-red-500 hover:bg-red-100">Logout</a>
+                        </div>
                     </div>
                 <?php else: ?>
                     <a href="/account/reg_login.php" class="flex items-center bg-white text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-100 transition">
@@ -47,14 +65,14 @@
         </div>
     </div>
 
-    <!-- Mobile Navigation Dropdown -->
+    <!-- Mobile Navigation -->
     <div id="mobile-menu" class="md:hidden hidden flex-col bg-indigo-700 px-4 py-3 space-y-2 text-white">
-        <a href="/" class="block hover:text-yellow-300">Home</a>
-        <a href="/products" class="block hover:text-yellow-300">Products</a>
-        <a href="/blogs" class="block hover:text-yellow-300">Blogs</a>
-        <a href="/contact" class="block hover:text-yellow-300">Contact</a>
-        <a href="/policy" class="block hover:text-yellow-300">Policy</a>
-        <a href="/cart" class="block hover:text-yellow-300">Cart</a>
+        <a href="/" class="block <?php echo activeLink('/'); ?> hover:text-yellow-300">Home</a>
+        <a href="/products" class="block <?php echo activeLink('/products'); ?> hover:text-yellow-300">Products</a>
+        <a href="/blogs" class="block <?php echo activeLink('/blogs'); ?> hover:text-yellow-300">Blogs</a>
+        <a href="/contact" class="block <?php echo activeLink('/contact'); ?> hover:text-yellow-300">Contact</a>
+        <a href="/policy" class="block <?php echo activeLink('/policy'); ?> hover:text-yellow-300">Policy</a>
+        <a href="/cart" class="block hover:text-yellow-300">Cart (<?php echo $cart_count; ?>)</a>
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="/account/logout.php" class="block text-red-300 hover:text-red-500">Logout</a>
         <?php else: ?>
@@ -63,7 +81,7 @@
     </div>
 </header>
 
-<!-- Search Bar Below Navbar -->
+<!-- Search Bar -->
 <div class="mt-16 w-full bg-white shadow-md">
     <div class="max-w-4xl mx-auto px-4 py-3 flex items-center space-x-4">
         <!-- Location -->
@@ -72,24 +90,24 @@
             Update Location
         </a>
 
-        <!-- Search Input -->
-        <div class="flex-grow relative">
-            <input type="text" id="search-bar" placeholder="Search products, brands, etc." class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 pl-10">
+        <!-- Search -->
+        <form action="/search.php" method="GET" class="flex-grow relative">
+            <input type="text" name="q" placeholder="Search products, brands, etc."
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 pl-10">
             <i class="fas fa-search absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"></i>
-        </div>
+        </form>
     </div>
 </div>
+
+<!-- Scripts -->
 <script>
     function toggleMenu() {
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
     }
 
-    // Example: Update cart count dynamically
-    function updateCartCount(count) {
-        document.getElementById('cart-count').textContent = count;
+    function toggleDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('hidden');
     }
-
-    // Simulate cart count update (for demonstration purposes)
-    updateCartCount(3); // Replace with actual cart count logic
 </script>
