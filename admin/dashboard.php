@@ -91,23 +91,25 @@ $sub_action = isset($_GET['sub_action']) ? $_GET['sub_action'] : ''; // New vari
             echo "<tbody>";
 
             // Example row (loop through actual data in production)
-            echo "<tr class='border-b hover:bg-gray-100'>
-                    <td class='px-4 py-2'>1</td>
-                    <td class='px-4 py-2'>Product Name</td>
-                    <td class='px-4 py-2'>This is a sample product description</td>
-                    <td class='px-4 py-2'>$99.99</td>
-                    <td class='px-4 py-2'><img src='path_to_image' alt='Product Image' class='w-12 h-12 object-cover rounded-md'></td>
-                    <td class='text-center px-4 py-2'>
-                        <a href='#' class='bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-400'>Edit</a><br><br>
-                        <a href='#' class='bg-green-500 text-white p-2 rounded-lg hover:bg-green-400'>Update</a><br><br>
-                        <a href='#' class='bg-red-500 text-white p-2 rounded-lg hover:bg-red-400'>Delete</a>
-                    </td>
+            foreach ($products as $product) {
+                echo "<tr class='border-b hover:bg-gray-100'>
+                        <td class='px-4 py-2'>" . $product['id'] . "</td>
+                        <td class='px-4 py-2'>" . $product['name'] . "</td>
+                        <td class='px-4 py-2'>" . $product['description'] . "</td>
+                        <td class='px-4 py-2'>$" . number_format($product['price'], 2) . "</td>
+                        <td class='px-4 py-2'><img src='../assets/images/product_images/" . $product['image'] . "' alt='" . $product['name'] . "' class='w-12 h-12 object-cover rounded-md'></td>
+                        <td class='text-center px-4 py-2'>
+                            <a href='#' class='bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-400'>Edit</a><br><br>
+                            <a href='#' class='bg-green-500 text-white p-2 rounded-lg hover:bg-green-400'>Update</a><br><br>
+                            <a href='#' class='bg-red-500 text-white p-2 rounded-lg hover:bg-red-400'>Delete</a>
+                        </td>
                     </tr>";
+            }
 
-                    echo "</tbody>";
-                    echo "</table>";
-                    echo "</div>";  // End table container
-                    echo "</div>";  // End main container
+            echo "</tbody>";
+            echo "</table>";
+            echo "</div>";  // End table container
+            echo "</div>";  // End main container
         } elseif ($action === 'manage_product') {
             // Manage Products Section (CRUD operations)
             echo "<h2 class='text-2xl font-semibold mb-4'>Manage Products</h2>";
